@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Win - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #050a14; color: #f8fafc; }
+        .glass-card { background: rgba(18, 28, 48, 0.7); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .animate-text { background: linear-gradient(90deg, #3b82f6, #ffffff, #3b82f6); background-size: 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shine 4s linear infinite; }
+        @keyframes shine { to { background-position: 200% center; } }
+        .slider-container { overflow: hidden; position: relative; }
+        .slider-wrapper { display: flex; animation: slide 10s linear infinite; width: 200%; }
+        @keyframes slide { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .marquee { overflow: hidden; white-space: nowrap; }
+        .marquee-inner { display: inline-block; animation: marquee 10s linear infinite; }
+        @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+    </style>
+</head>
+<body class="pb-24">
+
+    <!-- HEADER -->
+    <div class="w-full bg-[#050a14]/80 sticky top-0 z-40 border-b border-white/5 p-4 flex justify-between items-center backdrop-blur-xl">
+        <span class="text-lg font-extrabold tracking-tighter italic text-white">SPEED<span class="text-blue-500">WIN</span></span>
+        <div class="bg-blue-600/10 px-4 py-1.5 rounded-xl border border-blue-500/20 flex items-center gap-2 font-bold text-blue-400">
+            <i class="fa-solid fa-wallet text-sm"></i> ₹<span id="user-balance">0.00</span>
+        </div>
+    </div>
+
+    <div class="max-w-md mx-auto px-4 mt-6">
+        <div class="mb-6 text-center">
+            <h1 class="animate-text text-sm font-semibold uppercase tracking-[0.2em] opacity-90">Welcome To Our Most Trusted Platform</h1>
+        </div>
+
+        <!-- AUTO SLIDER -->
+        <div class="slider-container rounded-3xl mb-6 shadow-2xl">
+            <div class="slider-wrapper">
+                <img src="https://github.com/casinolootprmo/super-duper-broccoli/blob/2ca36c9756a6e28b014d5674089b34834e4ecabe/file_000000003054720892b7910c7c4cdd9a.png?raw=true" class="w-1/2 h-44 object-cover">
+                <img src="https://github.com/casinolootprmo/super-duper-broccoli/blob/2ca36c9756a6e28b014d5674089b34834e4ecabe/file_00000000e54c71faadca226245e86e8e.png?raw=true" class="w-1/2 h-44 object-cover">
+            </div>
+        </div>
+
+        <!-- LIVE WINNERS MARQUEE -->
+        <div class="flex items-center gap-2 mb-3">
+            <i class="fa-solid fa-trophy text-yellow-500"></i>
+            <h2 class="text-sm font-bold text-white uppercase tracking-widest">Live Winners</h2>
+        </div>
+        <div class="glass-card rounded-2xl p-3 mb-6 marquee">
+            <div class="marquee-inner text-[11px] text-blue-400 font-bold">
+                S***6855 won ₹5,200 | A***9921 won ₹12,000 | K***4432 won ₹800 | R***1102 won ₹25,000
+            </div>
+        </div>
+
+        <!-- HOT GAMES -->
+        <h2 class="text-sm font-bold text-white mb-4 px-1 flex items-center gap-2"><i class="fa-solid fa-fire text-orange-500"></i> Hot Games</h2>
+        <a href="mines.html" class="glass-card rounded-3xl p-6 shadow-xl flex items-center justify-between gap-6 border border-white/5 hover:border-blue-500/50 transition-all duration-300 mb-8">
+            <div class="flex items-center gap-5">
+                <img src="https://github.com/casinolootprmo/animated-succotash/blob/376cab647614d41c7ea41f62ef066a646f8a37c5/229.png?raw=true" class="w-28 h-28 rounded-2xl border border-white/10 shadow-lg">
+                <div>
+                    <h2 class="text-lg font-bold text-white">Mines Arena</h2>
+                    <p class="text-[12px] text-slate-400 mt-1">High Risk, High Reward Game</p>
+                </div>
+            </div>
+            <div class="bg-blue-600 text-[11px] px-6 py-3 rounded-2xl text-white font-bold shadow-lg shadow-blue-500/20">PLAY</div>
+        </a>
+
+        <!-- TOP WINNERS PODIUM -->
+        <h2 class="text-sm font-bold text-white mb-4 px-1 flex items-center gap-2"><i class="fa-solid fa-crown text-yellow-400"></i> Top Winners</h2>
+        
+        <div class="flex items-end justify-center gap-3 mb-8 pt-8">
+            <!-- Rank 2 (Left) -->
+            <div class="glass-card w-28 rounded-t-2xl p-3 text-center flex flex-col items-center justify-between border-t-2 border-slate-400 h-36 relative">
+                <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-slate-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow-md">2</div>
+                <img src="https://github.com/casinolootprmo/super-duper-broccoli/blob/4fc72cdccb9d4d596a2c9ac201a6bb51fbc79305/file_00000000d03c7208bd635a59263283b0.png?raw=true" class="w-10 h-10 rounded-full border border-slate-400 shadow-sm mt-1">
+                <div class="mt-2">
+                    <p class="text-[10px] font-bold text-white truncate max-w-[90px]">VG***46*</p>
+                    <p class="text-[11px] font-extrabold text-green-400 mt-0.5">₹46,009</p>
+                </div>
+            </div>
+
+            <!-- Rank 1 (Center) -->
+            <div class="glass-card w-32 rounded-t-2xl p-3 text-center flex flex-col items-center justify-between border-t-4 border-yellow-400 h-44 relative bg-gradient-to-b from-yellow-500/10 to-transparent">
+                <div class="absolute -top-7 left-1/2 transform -translate-x-1/2 text-yellow-400 text-lg animate-bounce"><i class="fa-solid fa-crown"></i></div>
+                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-slate-950 rounded-full w-6 h-6 flex items-center justify-center text-xs font-extrabold shadow-lg">1</div>
+                <img src="https://github.com/casinolootprmo/super-duper-broccoli/blob/4fc72cdccb9d4d596a2c9ac201a6bb51fbc79305/file_00000000d03c7208bd635a59263283b0.png?raw=true" class="w-12 h-12 rounded-full border-2 border-yellow-400 shadow-md mt-2">
+                <div class="mt-2">
+                    <p class="text-[11px] font-bold text-white truncate max-w-[100px]">VG***12*</p>
+                    <p class="text-xs font-extrabold text-green-400 mt-0.5">₹50,099</p>
+                </div>
+            </div>
+
+            <!-- Rank 3 (Right) -->
+            <div class="glass-card w-28 rounded-t-2xl p-3 text-center flex flex-col items-center justify-between border-t-2 border-amber-600 h-32 relative">
+                <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-amber-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow-md">3</div>
+                <img src="https://github.com/casinolootprmo/super-duper-broccoli/blob/4fc72cdccb9d4d596a2c9ac201a6bb51fbc79305/file_00000000d03c7208bd635a59263283b0.png?raw=true" class="w-10 h-10 rounded-full border border-amber-600 shadow-sm mt-1">
+                <div class="mt-2">
+                    <p class="text-[10px] font-bold text-white truncate max-w-[90px]">VG***88*</p>
+                    <p class="text-[11px] font-extrabold text-green-400 mt-0.5">₹20,890</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TERMS & CONDITIONS / DISCLAIMER (SABSE NICHE SHIFT KIYA) -->
+        <div class="glass-card rounded-2xl p-4 mb-8 border border-red-500/10 bg-red-500/[0.02]">
+            <div class="flex items-center gap-2 mb-2 text-red-400">
+                <i class="fa-solid fa-triangle-exclamation text-xs"></i>
+                <h3 class="text-xs font-bold uppercase tracking-wider">Terms & Risk Disclosure</h3>
+            </div>
+            <ul class="space-y-1.5 text-[11px] text-slate-400 leading-relaxed">
+                <li class="flex items-start gap-1.5">
+                    <span class="text-red-500 font-bold text-xs">•</span>
+                    <span><strong>18+ Only:</strong> Strictly restricted to users aged 18 or above. Legal action may apply for minors.</span>
+                </li>
+                <li class="flex items-start gap-1.5">
+                    <span class="text-red-500 font-bold text-xs">•</span>
+                    <span><strong>Financial Risk:</strong> This platform involves financial risk. Please invest responsibly and at your own risk.</span>
+                </li>
+                <li class="flex items-start gap-1.5">
+                    <span class="text-red-500 font-bold text-xs">•</span>
+                    <span><strong>No Guarantees:</strong> Profits are not guaranteed. The platform is not responsible for any financial losses incurred.</span>
+                </li>
+            </ul>
+        </div>
+        
+    </div>
+
+    <!-- NAVIGATION -->
+    <div class="fixed bottom-0 left-0 right-0 bg-[#0f172a]/95 border-t border-slate-800 py-3 flex justify-around items-center z-40">
+        <a href="dashboard.html" class="flex flex-col items-center gap-1 text-xs text-blue-500 font-bold"><i class="fa-solid fa-gamepad text-lg"></i><span>Play</span></a>
+        <a href="deposit.html" class="flex flex-col items-center gap-1 text-xs text-slate-400"><i class="fa-solid fa-circle-plus text-lg"></i><span>Deposit</span></a>
+        <a href="withdraw.html" class="flex flex-col items-center gap-1 text-xs text-slate-400"><i class="fa-solid fa-money-bill-wave text-lg"></i><span>Withdraw</span></a>
+        <a href="referral.html" class="flex flex-col items-center gap-1 text-xs text-slate-400"><i class="fa-solid fa-users text-lg"></i><span>Refer</span></a>
+        <a href="account.html" class="flex flex-col items-center gap-1 text-xs text-slate-400"><i class="fa-solid fa-user text-lg"></i><span>Account</span></a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const app = initializeApp({
+            apiKey: "AIzaSyBUaiTQtM_Wx4AKZpRC0zu2MVxwp9DXZoc",
+            authDomain: "test-15cde.firebaseapp.com",
+            projectId: "test-15cde",
+            storageBucket: "test-15cde.firebasestorage.app",
+            messagingSenderId: "741080887085",
+            appId: "1:741080887085:web:7631394ba98fd20da2eda4"
+        });
+        const db = getFirestore(app);
+        const userId = localStorage.getItem('sw_user_id');
+        if(userId) {
+            onSnapshot(doc(db, "speed_users", userId), (snap) => {
+                if(snap.exists()) document.getElementById('user-balance').innerText = parseFloat(snap.data().balance).toFixed(2);
+            });
+        }
+    </script>
+</body>
+</html>
