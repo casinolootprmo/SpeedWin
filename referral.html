@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agency Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #0b0f19; color: #ffffff; }
+    </style>
+</head>
+<body class="pb-24">
+
+    <!-- TOP HEADER -->
+    <div class="bg-[#111827] p-8 text-center border-b border-gray-800">
+        <p class="text-[11px] text-gray-400 font-bold uppercase tracking-widest">Yesterday's total commission</p>
+        <h1 class="text-5xl font-extrabold mt-2 text-white">0</h1>
+        <!-- EARN BADGE -->
+        <div class="mt-4 inline-flex items-center gap-1.5 bg-gradient-to-r from-yellow-600/20 to-yellow-600/10 border border-yellow-600/30 px-4 py-1.5 rounded-full">
+            <i class="fa-solid fa-coins text-yellow-500 text-xs"></i>
+            <span class="text-xs font-bold text-yellow-500">Earn ₹2 Per Referral</span>
+        </div>
+    </div>
+
+    <div class="max-w-md mx-auto px-4 mt-6 space-y-4">
+        
+        <!-- STATS BOX -->
+        <div class="bg-[#111827] rounded-2xl p-6 border border-gray-800">
+            <div class="grid grid-cols-2 text-center divide-x divide-gray-800">
+                <div>
+                    <p class="text-[10px] text-gray-500 font-bold uppercase">Direct Subordinates</p>
+                    <h3 id="direct-count" class="text-xl font-bold mt-1 text-white">0</h3>
+                </div>
+                <div>
+                    <p class="text-[10px] text-gray-500 font-bold uppercase">Team Subordinates</p>
+                    <h3 id="team-count" class="text-xl font-bold mt-1 text-white">0</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- INVITE LINK BOX -->
+        <div class="bg-[#111827] rounded-2xl p-5 border border-gray-800">
+            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3 block">Your Invitation Link</label>
+            <div class="bg-black border border-gray-700 p-3.5 rounded-xl flex items-center justify-between">
+                <p id="ref-link-display" class="text-xs text-blue-400 font-mono truncate max-w-[200px]">Loading...</p>
+                <button onclick="copyRefLink()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-xs font-bold transition-all">Copy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAVBAR -->
+    <div class="fixed bottom-0 left-0 right-0 bg-[#0f172a]/95 border-t border-slate-800 py-3 flex justify-around items-center z-40">
+        <a href="dashboard.html" class="flex flex-col items-center gap-1 text-xs text-slate-400"><i class="fa-solid fa-gamepad text-lg"></i><span>Play</span></a>
+        <a href="deposit.html" class="flex flex-col items-center gap-1 text-xs text-slate-400"><i class="fa-solid fa-circle-plus text-lg"></i><span>Deposit</span></a>
+        <a href="withdraw.html" class="flex flex-col items-center gap-1 text-xs text-slate-400"><i class="fa-solid fa-money-bill-wave text-lg"></i><span>Withdraw</span></a>
+        <a href="referral.html" class="flex flex-col items-center gap-1 text-xs text-blue-500 font-bold"><i class="fa-solid fa-users text-lg"></i><span>Agency</span></a>
+        <a href="account.html" class="flex flex-col items-center gap-1 text-xs text-slate-400"><i class="fa-solid fa-user text-lg"></i><span>Account</span></a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, query, collection, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBUaiTQtM_Wx4AKZpRC0zu2MVxwp9DXZoc",
+            authDomain: "test-15cde.firebaseapp.com",
+            projectId: "test-15cde",
+            storageBucket: "test-15cde.firebasestorage.app",
+            messagingSenderId: "741080887085",
+            appId: "1:741080887085:web:7631394ba98fd20da2eda4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const userId = localStorage.getItem('sw_user_id');
+
+        if(userId) {
+            const qDirect = query(collection(db, "speed_users"), where("invitedBy", "==", userId));
+            getDocs(qDirect).then(snap => document.getElementById('direct-count').innerText = snap.size);
+            document.getElementById('team-count').innerText = "0"; 
+        }
+
+        onSnapshot(doc(db, "speed_config", "global"), (snap) => {
+            let appDomain = snap.exists() ? snap.data().appLink : "https://speedwin.com";
+            document.getElementById('ref-link-display').innerText = appDomain + "/index.html?ref=" + (userId || "0000");
+        });
+
+        window.copyRefLink = function() {
+            const txt = document.getElementById('ref-link-display').innerText;
+            navigator.clipboard.writeText(txt);
+            alert("Referral link copied!");
+        };
+    </script>
+</body>
+</html>
