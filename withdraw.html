@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Win - Premium Withdraw</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f6f7fb; color: #1e293b; min-height: 100vh; }
+        .purple-header { background: linear-gradient(90deg, #7c3aed, #6d28d9); }
+        .premium-card { background: linear-gradient(135deg, #1e1b4b, #311042); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 12px 24px rgba(30, 27, 75, 0.25); position: relative; }
+        .premium-card::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 8px 8px; pointer-events: none; }
+        .method-tab { transition: all 0.2s ease; }
+        .method-tab.active { background: linear-gradient(135deg, #8b5cf6, #6d28d9); border: 1px solid #7c3aed; color: #ffffff; box-shadow: 0 8px 16px rgba(124, 58, 237, 0.25); }
+        .input-box-shadow { box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.03); }
+        .toast-notif { transform: translate(-50%, -40px) scale(0.9); opacity: 0; transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .toast-show { transform: translate(-50%, 0) scale(1); opacity: 1; }
+        .sim-chip { width: 34px; height: 26px; background: linear-gradient(135deg, #e2ba6e, #b88728); border-radius: 4px; position: relative; border: 1px solid #8f6213; }
+        .sim-chip::after { content: ''; position: absolute; inset: 4px; border: 1px solid rgba(255,255,255,0.2); }
+    </style>
+</head>
+<body class="pb-24">
+
+    <!-- TOAST NOTIFICATION SYSTEM -->
+    <div id="toast-container" class="toast-notif fixed top-6 left-1/2 z-50 bg-slate-900 text-white px-6 py-3.5 rounded-2xl flex items-center gap-3 shadow-2xl pointer-events-none">
+        <span id="toast-icon"></span>
+        <span id="toast-text" class="text-xs font-bold tracking-wide"></span>
+    </div>
+
+    <!-- PURPLE HEADER BAR (History link removed completely) -->
+    <div class="purple-header w-full text-white px-4 py-4 sticky top-0 z-40 flex items-center shadow-md">
+        <a href="dashboard.html" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+            <i class="fa-solid fa-chevron-left text-sm"></i>
+        </a>
+        <h1 class="text-base font-semibold tracking-wide mx-auto pr-8">Withdraw</h1>
+    </div>
+
+    <div class="max-w-md mx-auto px-4 mt-4 space-y-4">
+        
+        <!-- LUXURY CHIP AVAILABLE BALANCE CARD -->
+        <div class="premium-card rounded-2xl p-6 text-white overflow-hidden">
+            <div class="flex items-center gap-2 text-amber-400/80 font-bold text-[10px] tracking-widest uppercase opacity-70">
+                <i class="fa-solid fa-wallet text-xs"></i> Available Balance
+            </div>
+            <div class="text-3xl font-bold text-white mt-2 tracking-wide flex items-center justify-between">
+                <div>₹<span id="payout-balance" class="font-mono">0.00</span></div>
+                <button class="w-7 h-7 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 active:scale-95 transition-all">
+                    <i class="fa-solid fa-rotate text-xs opacity-60"></i>
+                </button>
+            </div>
+            <div class="mt-5 flex justify-between items-end">
+                <div class="sim-chip shadow-inner"></div>
+                <span class="text-[10px] font-mono tracking-widest opacity-40">**** **** ****</span>
+            </div>
+        </div>
+
+        <!-- PAYMENT CHANNELS -->
+        <div class="w-full">
+            <div class="method-tab active rounded-2xl p-3.5 text-center flex items-center justify-center gap-2 cursor-default">
+                <i class="fa-solid fa-qrcode text-xl"></i>
+                <span class="text-xs font-black tracking-widest uppercase">UPI Withdrawal Active</span>
+            </div>
+        </div>
+
+        <!-- UPI CONFIGURATION CARD -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm space-y-3">
+            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-brands fa-vimeo-v text-purple-600"></i> Your UPI Address (VPA)
+            </div>
+            <div class="relative bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-3 input-box-shadow flex items-center">
+                <input type="text" id="withdraw-upi" placeholder="username@upi" class="w-full bg-transparent text-sm text-slate-800 font-bold placeholder:text-slate-400 focus:outline-none">
+                <i class="fa-solid fa-pencil text-slate-300 text-xs ml-2"></i>
+            </div>
+        </div>
+
+        <!-- WITHDRAWAL CONSOLE BLOCK -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-4">
+            
+            <!-- AMOUNT BOX -->
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 input-box-shadow flex items-center justify-between">
+                <span class="text-purple-600 font-bold text-lg mr-2">₹</span>
+                <input type="number" id="withdraw-amount" placeholder="Please enter the amount" oninput="updateLivePreview(this.value)"
+                    class="w-full bg-transparent text-slate-800 font-bold text-base focus:outline-none placeholder:text-slate-400 placeholder:font-normal placeholder:text-sm font-mono">
+            </div>
+
+            <!-- CARD FOOTER TRACKS -->
+            <div class="flex justify-between items-center text-xs px-1">
+                <div class="text-slate-400 font-medium">Withdrawable balance <span class="text-purple-600 font-bold font-mono">₹<span id="inner-withdrawable">0.00</span></span></div>
+                <button onclick="fillMaxBalance()" class="text-purple-600 font-bold text-xs bg-purple-50 px-3 py-1 rounded-full border border-purple-100 hover:bg-purple-100 transition-colors">All</button>
+            </div>
+
+            <div class="flex justify-between items-center pt-2 border-t border-slate-100 text-xs px-1">
+                <span class="text-slate-400 font-medium">Cash withdrawal amount</span>
+                <span class="text-purple-600 font-black text-sm font-mono">₹<span id="live-preview-amount">0.00</span></span>
+            </div>
+        </div>
+
+        <!-- SUBMIT ACTION TRIGGER BUTTON -->
+        <button onclick="submitWithdrawal()" class="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-bold py-4 rounded-full text-sm uppercase tracking-widest shadow-lg shadow-purple-500/20 active:scale-[0.99] transition-all">Withdraw</button>
+
+        <!-- RULES EXPLAINER BOX -->
+        <div class="bg-purple-50/50 border border-purple-100 rounded-2xl p-5 space-y-3 text-xs text-slate-500 font-medium">
+            <div class="flex items-start gap-2.5">
+                <span class="text-purple-500 mt-0.5">♦</span>
+                <span>Withdrawal Fee: <strong class="text-purple-600">0%</strong></span>
+            </div>
+            <div class="flex items-start gap-2.5">
+                <span class="text-purple-500 mt-0.5">♦</span>
+                <span class="leading-relaxed">After making a deposit, you must complete a <strong class="text-purple-600 font-bold">1x play/bet turnover</strong> of your deposit amount before initiating any withdrawal. Required bet pending: <strong class="text-rose-500 font-mono">₹<span id="wager-amount">0.00</span></strong></span>
+            </div>
+            <div class="flex items-start gap-2.5">
+                <span class="text-purple-500 mt-0.5">♦</span>
+                <span>Withdrawal time <strong class="text-slate-700 font-mono">00:00-23:59</strong></span>
+            </div>
+            <div class="flex items-start gap-2.5">
+                <span class="text-purple-500 mt-0.5">♦</span>
+                <span>Withdrawal amount range <strong class="text-rose-500 font-bold font-mono">₹110.00-₹5,000.00</strong></span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- PERSISTENT NAVIGATION FOOTER BAR -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 py-3 flex justify-around items-center z-40 shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
+        <a href="dashboard.html" class="flex flex-col items-center gap-1 text-[10px] font-medium text-slate-400"><i class="fa-solid fa-gamepad text-base"></i><span>Play</span></a>
+        <a href="deposit.html" class="flex flex-col items-center gap-1 text-[10px] font-medium text-slate-400"><i class="fa-solid fa-circle-plus text-base"></i><span>Deposit</span></a>
+        <a href="withdraw.html" class="flex flex-col items-center gap-1 text-[10px] font-bold text-purple-600"><i class="fa-solid fa-money-bill-wave text-base"></i><span>Withdraw</span></a>
+        <a href="referral.html" class="flex flex-col items-center gap-1 text-[10px] font-medium text-slate-400"><i class="fa-solid fa-users text-base"></i><span>Refer</span></a>
+        <a href="account.html" class="flex flex-col items-center gap-1 text-[10px] font-medium text-slate-400"><i class="fa-solid fa-user text-base"></i><span>Account</span></a>
+    </div>
+
+    <!-- CONTROLLER SYSTEM SCRIPTS -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBUaiTQtM_Wx4AKZpRC0zu2MVxwp9DXZoc",
+            authDomain: "test-15cde.firebaseapp.com",
+            projectId: "test-15cde",
+            storageBucket: "test-15cde.firebasestorage.app",
+            messagingSenderId: "741080887085",
+            appId: "1:741080887085:web:7631394ba98fd20da2eda4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const userId = localStorage.getItem('sw_user_id');
+        let userProfile = null;
+
+        window.showNotice = function(msg, isSuccess = false) {
+            const container = document.getElementById('toast-container');
+            const icon = document.getElementById('toast-icon');
+            const text = document.getElementById('toast-text');
+            text.innerText = msg;
+            
+            container.classList.remove('toast-show');
+            
+            if(isSuccess) {
+                container.className = "toast-notif fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 border border-emerald-500/30 text-emerald-400 px-6 py-3.5 rounded-2xl flex items-center gap-2.5 shadow-2xl pointer-events-auto toast-show font-bold text-xs w-[90%] justify-center";
+                icon.innerHTML = "<i class='fa-solid fa-circle-check text-sm'></i>";
+            } else {
+                container.className = "toast-notif fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 border border-red-500/30 text-red-400 px-6 py-3.5 rounded-2xl flex items-center gap-2.5 shadow-2xl pointer-events-auto toast-show font-bold text-xs w-[90%] justify-center";
+                icon.innerHTML = "<i class='fa-solid fa-triangle-exclamation text-sm'></i>";
+            }
+            setTimeout(() => { container.classList.remove('toast-show'); }, 3500);
+        };
+
+        if(userId) {
+            onSnapshot(doc(db, "speed_users", userId), (snap) => {
+                if(snap.exists()) {
+                    userProfile = snap.data();
+                    
+                    const liveBal = parseFloat(userProfile.balance || 0).toFixed(2);
+                    const requiredWager = parseFloat(userProfile.wager || 0).toFixed(2); 
+
+                    document.getElementById('payout-balance').innerText = liveBal;
+                    document.getElementById('inner-withdrawable').innerText = liveBal;
+                    document.getElementById('wager-amount').innerText = requiredWager;
+                }
+            });
+        }
+
+        window.updateLivePreview = function(val) {
+            const parsedVal = parseFloat(val);
+            if(!isNaN(parsedVal) && parsedVal > 0) {
+                document.getElementById('live-preview-amount').innerText = parsedVal.toFixed(2);
+            } else {
+                document.getElementById('live-preview-amount').innerText = "0.00";
+            }
+        };
+
+        window.fillMaxBalance = function() {
+            if(userProfile && userProfile.balance) {
+                const maxAmt = parseFloat(userProfile.balance);
+                document.getElementById('withdraw-amount').value = maxAmt;
+                window.updateLivePreview(maxAmt);
+            }
+        };
+
+        window.submitWithdrawal = async function() {
+            const amtInput = document.getElementById('withdraw-amount');
+            const upiInput = document.getElementById('withdraw-upi');
+            const amt = parseFloat(amtInput.value);
+            const upiAddress = upiInput.value.trim();
+
+            if(!userProfile) { showNotice("Please login first!"); return; }
+            if(isNaN(amt) || amt < 110) { showNotice("Minimum withdrawal amount is ₹110!"); return; }
+            if(amt > parseFloat(userProfile.balance)) { showNotice("Insufficient balance!"); return; }
+            if(!upiAddress.includes('@')) { showNotice("Please enter a valid UPI ID!"); return; }
+
+            // 🔴 1x WAGER CHECK LOGIC 🔴
+            const currentWager = parseFloat(userProfile.wager || 0);
+            if(currentWager > 0) {
+                showNotice(`Complete 1x turnover first! Need to bet ₹${currentWager.toFixed(2)} more.`);
+                return;
+            }
+
+            try {
+                // Update User Balance safely
+                await updateDoc(doc(db, "speed_users", userId), { 
+                    balance: parseFloat(userProfile.balance) - amt 
+                });
+
+                // Add document entry to Firestore transaction ledgers
+                await addDoc(collection(db, "speed_ledgers"), {
+                    userDocId: userId,
+                    uid: userProfile.uid,
+                    phone: userProfile.phone || 'N/A', 
+                    amount: amt,
+                    type: 'WITHDRAW',
+                    status: 'PENDING',
+                    details: "UPI: " + upiAddress,
+                    epochTime: Date.now()
+                });
+
+                showNotice("Request submitted successfully!", true);
+                amtInput.value = '';
+                upiInput.value = '';
+                document.getElementById('live-preview-amount').innerText = "0.00";
+            } catch (err) {
+                console.error(err);
+                showNotice("System error, try again.");
+            }
+        };
+    </script>
+</body>
+</html>
