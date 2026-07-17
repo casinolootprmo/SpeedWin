@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Win - Play Mines Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #030712; color: #f8fafc; }
+        .premium-bg { background: radial-gradient(circle at top, #0f172a 0%, #030712 100%); }
+        .glass-card { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+        .mine-btn { background: #1f2937; border: 1px solid rgba(255, 255, 255, 0.08); border-bottom: 3px solid rgba(0, 0, 0, 0.3); transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
+        .mine-btn:active:not(:disabled) { transform: translateY(2px); border-bottom-width: 1px; }
+        .mine-btn.gem { background: linear-gradient(135deg, #059669, #10b981); border-color: #34d399; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+        .mine-btn.mine { background: linear-gradient(135deg, #dc2626, #ef4444); border-color: #f87171; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+        
+        /* TOAST ANIMATION ENGINE */
+        .toast-notif { transform: translate(-50%, -40px) scale(0.9); opacity: 0; transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .toast-show { transform: translate(-50%, 0) scale(1); opacity: 1; }
+        
+        @keyframes blast-shake {
+            0%, 100% { transform: translate(-50%, 0) scale(1); }
+            20%, 60% { transform: translate(-52%, -2px) scale(1.02); }
+            40%, 80% { transform: translate(-48%, 2px) scale(1.02); }
+        }
+        .toast-blast-animate { animation: blast-shake 0.3s ease-in-out; }
+        .glow-text { text-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+    </style>
+</head>
+<body class="premium-bg min-h-screen relative pb-12">
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast-container" class="toast-notif fixed top-6 left-1/2 z-50 bg-slate-900/95 border border-slate-700 px-6 py-3.5 rounded-2xl flex items-center gap-3 shadow-2xl pointer-events-none">
+        <span id="toast-icon"></span>
+        <span id="toast-text" class="text-xs font-bold tracking-wide"></span>
+    </div>
+
+    <!-- NAVBAR HEADER -->
+    <div class="w-full bg-slate-950/60 sticky top-0 z-40 border-b border-white/[0.04] p-4 flex justify-between items-center backdrop-blur-xl">
+        <a href="dashboard.html" class="flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-white transition-colors bg-white/[0.03] px-3 py-2 rounded-xl border border-white/[0.05] shadow-inner">
+            <i class="fa-solid fa-arrow-left text-[10px]"></i> Home
+        </a>
+        <span class="text-base font-black tracking-wider glow-text italic text-white">SPEED <span class="text-blue-500">WIN</span></span>
+        <div class="bg-blue-500/5 px-3.5 py-1.5 rounded-xl border border-blue-500/20 flex items-center gap-2 font-bold text-blue-400 shadow-sm">
+            <i class="fa-solid fa-wallet text-xs text-blue-500"></i> ₹<span id="user-balance" class="font-mono">0.00</span>
+        </div>
+    </div>
+
+    <!-- MAIN CONSOLE -->
+    <div class="max-w-md mx-auto px-4 mt-6 space-y-5">
+        <div class="glass-card rounded-3xl p-5 relative overflow-hidden">
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- GAME TOP BAR -->
+            <div class="flex justify-between items-center mb-5 relative z-10">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-2.5 h-2.5 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.6)]" id="status-dot"></div>
+                    <div>
+                        <h2 class="text-sm font-black tracking-wide flex items-center gap-1.5 text-white uppercase">Mines Arena</h2>
+                        <p class="text-[9px] font-medium text-slate-400 tracking-wider uppercase mt-0.5">Multiplier grows +0.5x every step</p>
+                    </div>
+                </div>
+                <span id="mult-display" class="text-xs font-black text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20 font-mono tracking-wide shadow-inner">1.0x</span>
+            </div>
+
+            <!-- GAME GRID MATRIX -->
+            <div class="p-3 bg-slate-950/40 border border-white/[0.03] rounded-2xl max-w-[290px] mx-auto my-5 shadow-inner">
+                <div class="grid grid-cols-5 gap-2" id="game-grid"></div>
+            </div>
+
+            <!-- CONTROL DASHBOARD PANEL -->
+            <div class="space-y-3.5 pt-3 border-t border-white/[0.05] relative z-10">
+                <div class="bg-slate-950/60 border border-white/[0.05] rounded-xl px-4 py-3 flex items-center justify-between shadow-inner focus-within:border-blue-500/50 transition-colors">
+                    <span class="text-[10px] font-black tracking-wider text-slate-400 uppercase">Amount Bet</span>
+                    <div class="flex items-center gap-1">
+                        <span class="text-slate-500 font-bold text-sm">₹</span>
+                        <input type="number" id="bet-amount" value="100" min="10" step="10" 
+                            class="w-24 bg-transparent text-right font-black text-white text-base focus:outline-none placeholder:text-slate-800 font-mono">
+                    </div>
+                </div>
+                
+                <div class="flex gap-3">
+                    <button id="start-btn" onclick="startGameRound()" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black py-4 rounded-xl text-xs uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20 border-t border-white/10 active:scale-[0.99]">Place Bet</button>
+                    <button id="cashout-btn" disabled onclick="claimCashout()" class="flex-1 bg-slate-800/80 text-slate-500 font-black py-4 rounded-xl text-xs uppercase tracking-widest cursor-not-allowed transition-all border border-transparent">Cashout (₹0)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ENGINE CORE LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBUaiTQtM_Wx4AKZpRC0zu2MVxwp9DXZoc",
+            authDomain: "test-15cde.firebaseapp.com",
+            projectId: "test-15cde",
+            storageBucket: "test-15cde.firebasestorage.app",
+            messagingSenderId: "741080887085",
+            appId: "1:741080887085:web:7631394ba98fd20da2eda4",
+            measurementId: "G-SG5FK8CD7S"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+        const userId = localStorage.getItem('sw_user_id');
+
+        if(!userId) { window.location.href = "index.html"; }
+
+        let userData = null;
+        let board = [];
+        let isPlaying = false;
+        let safeClicks = 0;
+        let betValue = 0;
+
+        window.showNotice = function(msg, isSuccess = false) {
+            const container = document.getElementById('toast-container');
+            const icon = document.getElementById('toast-icon');
+            const text = document.getElementById('toast-text');
+            text.innerText = msg;
+            
+            container.classList.remove('toast-blast-animate', 'toast-show');
+            
+            if(isSuccess) {
+                container.className = "toast-notif fixed top-6 left-1/2 z-50 bg-emerald-950/95 border border-emerald-500/40 text-emerald-400 px-6 py-3.5 rounded-2xl flex items-center gap-3 shadow-[0_0_30px_rgba(16,185,129,0.2)] pointer-events-auto toast-show font-bold";
+                icon.innerHTML = "<i class='fa-solid fa-circle-check text-base'></i>";
+            } else {
+                container.className = "toast-notif fixed top-6 left-1/2 z-50 bg-red-950/95 border border-red-500/40 text-red-400 px-6 py-3.5 rounded-2xl flex items-center gap-3 shadow-[0_0_30px_rgba(239,68,68,0.3)] pointer-events-auto toast-show font-bold toast-blast-animate";
+                icon.innerHTML = "<i class='fa-solid fa-bomb text-base text-red-400 animate-bounce'></i>";
+            }
+            
+            setTimeout(() => { container.classList.remove('toast-show', 'toast-blast-animate'); }, 2000);
+        };
+
+        onSnapshot(doc(db, "speed_users", userId), (snap) => {
+            if(snap.exists()) {
+                userData = snap.data();
+                document.getElementById('user-balance').innerText = parseFloat(userData.balance).toFixed(2);
+            }
+        });
+
+        function setupGrid() {
+            const grid = document.getElementById('game-grid');
+            grid.innerHTML = '';
+            for(let i=0; i<25; i++) {
+                const b = document.createElement('button');
+                b.className = "mine-btn aspect-square w-full rounded-xl flex items-center justify-center text-transparent font-bold select-none hover:border-slate-500/40 hover:bg-slate-700/50";
+                b.onclick = () => handleCellClick(i, b);
+                b.innerText = '?';
+                grid.appendChild(b);
+            }
+        }
+
+        window.startGameRound = async function() {
+            if(isPlaying) return;
+            betValue = parseFloat(document.getElementById('bet-amount').value);
+            if(isNaN(betValue) || betValue < 10) { showNotice("Minimum bet amount ₹10 hai!"); return; }
+            if(betValue > userData.balance) { showNotice("Low Balance! Wallet me paise add karein."); return; }
+
+            await updateDoc(doc(db, "speed_users", userId), { balance: userData.balance - betValue });
+
+            board = Array(25).fill('GEM');
+            let mCount = 0;
+            while(mCount < 5) {
+                let r = Math.floor(Math.random() * 25);
+                if(board[r] !== 'MINE') { board[r] = 'MINE'; mCount++; }
+            }
+
+            isPlaying = true;
+            safeClicks = 0;
+            document.getElementById('mult-display').innerText = "1.0x";
+            
+            const dot = document.getElementById('status-dot');
+            dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)] animate-pulse";
+
+            const cashBtn = document.getElementById('cashout-btn');
+            cashBtn.removeAttribute('disabled');
+            cashBtn.className = "flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black py-4 rounded-xl text-xs uppercase tracking-widest shadow-lg shadow-emerald-500/20 border-t border-white/20 active:scale-[0.99] cursor-pointer";
+            cashBtn.innerText = `Cashout (₹${betValue})`;
+
+            document.getElementById('start-btn').setAttribute('disabled', 'true');
+            document.getElementById('start-btn').className = "flex-1 bg-slate-900 text-slate-600 font-black py-4 rounded-xl text-xs uppercase tracking-widest cursor-not-allowed shadow-none border border-transparent";
+            setupGrid();
+        };
+
+        window.handleCellClick = function(idx, btn) {
+            if(!isPlaying || btn.classList.contains('gem') || btn.classList.contains('mine')) return;
+
+            if(board[idx] === 'MINE') {
+                btn.className = "mine-btn aspect-square w-full rounded-xl flex items-center justify-center text-white font-bold select-none mine animate-bounce";
+                btn.innerHTML = "<i class='fa-solid fa-bomb text-base text-white'></i>";
+                revealAll();
+                finishRound(false);
+            } else {
+                btn.className = "mine-btn aspect-square w-full rounded-xl flex items-center justify-center text-white font-bold select-none gem";
+                btn.innerHTML = "<i class='fa-solid fa-gem text-xs text-white'></i>";
+                safeClicks++;
+                
+                let mult = 1.0 + (safeClicks * 0.5);
+                let currentWin = betValue * mult;
+                
+                document.getElementById('mult-display').innerText = mult.toFixed(1) + "x";
+                document.getElementById('cashout-btn').innerText = `Cashout (₹${currentWin.toFixed(2)})`;
+            }
+        };
+
+        window.claimCashout = async function() {
+            if(!isPlaying || safeClicks === 0) return;
+            let mult = 1.0 + (safeClicks * 0.5);
+            let totalWin = betValue * mult;
+
+            await updateDoc(doc(db, "speed_users", userId), { balance: userData.balance + totalWin });
+            // English Translation Applied Here
+            showNotice(`Victory! ₹${totalWin.toFixed(2)} credited to your wallet. 🏆`, true);
+            revealAll();
+            finishRound(true);
+        };
+
+        function revealAll() {
+            document.querySelectorAll('.mine-btn').forEach((btn, i) => {
+                if(board[i] === 'MINE') {
+                    btn.className = "mine-btn aspect-square w-full rounded-xl flex items-center justify-center text-white font-bold select-none mine";
+                    btn.innerHTML = "<i class='fa-solid fa-bomb text-xs text-white'></i>";
+                } else {
+                    btn.className = "mine-btn aspect-square w-full rounded-xl flex items-center justify-center text-white font-bold select-none gem";
+                    btn.innerHTML = "<i class='fa-solid fa-gem text-[10px] text-white'></i>";
+                }
+            });
+        }
+
+        function finishRound(won) {
+            isPlaying = false;
+            
+            const dot = document.getElementById('status-dot');
+            dot.className = "w-2.5 h-2.5 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.6)]";
+
+            document.getElementById('start-btn').removeAttribute('disabled');
+            document.getElementById('start-btn').className = "flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black py-4 rounded-xl text-xs uppercase tracking-widest shadow-lg shadow-blue-600/20 border-t border-white/10 active:scale-[0.99]";
+            
+            const cashBtn = document.getElementById('cashout-btn');
+            cashBtn.setAttribute('disabled', 'true');
+            cashBtn.className = "flex-1 bg-slate-800/80 text-slate-500 font-black py-4 rounded-xl text-xs uppercase tracking-widest cursor-not-allowed border border-transparent";
+            cashBtn.innerText = "Cashout (₹0)";
+            
+            if(!won) { showNotice("Oops! BOOM! Better luck next time! 💥"); }
+        }
+
+        setupGrid();
+    </script>
+</body>
+  </html>
