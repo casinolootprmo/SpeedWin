@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Win - Login & Sign Up</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #0b1528; color: #f8fafc; }
+        .glass-card { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .tab-active { background-color: #2563eb; color: white; }
+        .toast-notif { transform: translateY(-50px); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .toast-show { transform: translateY(0); opacity: 1; }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen px-4 relative overflow-hidden">
+
+    <div id="toast-container" class="toast-notif opacity-0 fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-slate-900 border border-slate-700 px-6 py-3 rounded-xl flex items-center gap-2.5 shadow-2xl pointer-events-none">
+        <span id="toast-icon"></span>
+        <span id="toast-text" class="text-xs font-bold tracking-wide"></span>
+    </div>
+
+    <div class="w-full max-w-md glass-card rounded-2xl p-6 shadow-2xl space-y-6 z-10">
+        <div class="text-center">
+            <div class="w-14 h-14 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center font-black text-2xl text-white mx-auto shadow-lg shadow-blue-500/20">SW</div>
+            <h1 class="text-2xl font-extrabold tracking-wide mt-3 bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">SPEED WIN</h1>
+            <p id="page-instruction" class="text-xs text-slate-400 mt-1">Enter your details to access your account</p>
+        </div>
+
+        <div class="grid grid-cols-2 bg-slate-900 p-1 rounded-xl border border-slate-800">
+            <button id="tab-login" onclick="switchTab('LOGIN')" class="tab-active py-2.5 text-xs font-bold rounded-lg uppercase tracking-wider transition-all">
+                <i class="fa-solid fa-right-to-bracket mr-1"></i> Login
+            </button>
+            <button id="tab-register" onclick="switchTab('REGISTER')" class="text-slate-400 py-2.5 text-xs font-bold rounded-lg uppercase tracking-wider transition-all">
+                <i class="fa-solid fa-user-plus mr-1"></i> Register
+            </button>
+        </div>
+
+        <div class="space-y-4">
+            <div class="space-y-1.5">
+                <label class="text-xs font-bold text-slate-300 flex items-center gap-1.5"><i class="fa-solid fa-phone text-blue-400"></i> Phone Number</label>
+                <input type="number" id="auth-phone" placeholder="Enter your mobile number" class="w-full bg-slate-950 border border-slate-700 text-sm p-3 rounded-xl focus:outline-none focus:border-blue-500 text-white placeholder:text-slate-600">
+            </div>
+            
+            <div class="space-y-1.5">
+                <label class="text-xs font-bold text-slate-300 flex items-center gap-1.5"><i class="fa-solid fa-lock text-blue-400"></i> Password</label>
+                <input type="password" id="auth-password" placeholder="Enter your password" class="w-full bg-slate-950 border border-slate-700 text-sm p-3 rounded-xl focus:outline-none focus:border-blue-500 text-white placeholder:text-slate-600">
+            </div>
+
+            <div class="pt-2">
+                <button id="submit-btn" onclick="handleSubmit()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider transition-all shadow-md shadow-blue-600/10">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBUaiTQtM_Wx4AKZpRC0zu2MVxwp9DXZoc",
+            authDomain: "test-15cde.firebaseapp.com",
+            projectId: "test-15cde",
+            storageBucket: "test-15cde.firebasestorage.app",
+            messagingSenderId: "741080887085",
+            appId: "1:741080887085:web:7631394ba98fd20da2eda4",
+            measurementId: "G-SG5FK8CD7S"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        let currentMode = 'LOGIN';
+
+        window.showNotice = function(msg, isSuccess = false) {
+            const container = document.getElementById('toast-container');
+            const icon = document.getElementById('toast-icon');
+            const text = document.getElementById('toast-text');
+            
+            text.innerText = msg;
+            if(isSuccess) {
+                container.className = "toast-notif fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-emerald-950/90 border border-emerald-500 text-emerald-400 px-6 py-3 rounded-xl flex items-center gap-2.5 shadow-2xl pointer-events-auto toast-show";
+                icon.innerHTML = "<i class='fa-solid fa-circle-check text-sm'></i>";
+            } else {
+                container.className = "toast-notif fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-red-950/90 border border-red-500 text-red-400 px-6 py-3 rounded-xl flex items-center gap-2.5 shadow-2xl pointer-events-auto toast-show";
+                icon.innerHTML = "<i class='fa-solid fa-triangle-exclamation text-sm'></i>";
+            }
+            setTimeout(() => { container.classList.remove('toast-show'); container.style.opacity = "0"; }, 3000);
+        };
+
+        window.switchTab = function(mode) {
+            currentMode = mode;
+            const loginTab = document.getElementById('tab-login');
+            const registerTab = document.getElementById('tab-register');
+            const submitBtn = document.getElementById('submit-btn');
+            const instruction = document.getElementById('page-instruction');
+
+            if (mode === 'LOGIN') {
+                loginTab.className = "tab-active py-2.5 text-xs font-bold rounded-lg uppercase tracking-wider transition-all";
+                registerTab.className = "text-slate-400 py-2.5 text-xs font-bold rounded-lg uppercase tracking-wider transition-all";
+                submitBtn.innerText = "Login";
+                instruction.innerText = "Enter your Phone Number and Password to login";
+            } else {
+                registerTab.className = "tab-active py-2.5 text-xs font-bold rounded-lg uppercase tracking-wider transition-all";
+                loginTab.className = "text-slate-400 py-2.5 text-xs font-bold rounded-lg uppercase tracking-wider transition-all";
+                submitBtn.innerText = "Create Account";
+                instruction.innerText = "Create a new account with your Phone Number and a new password";
+            }
+        };
+
+        window.handleSubmit = async function() {
+            const phone = document.getElementById('auth-phone').value.trim();
+            const password = document.getElementById('auth-password').value.trim();
+
+            if(!phone || !password) { showNotice("Please fill in all details!"); return; }
+            if(phone.length < 10) { showNotice("Enter a valid 10-digit phone number!"); return; }
+
+            const userQuery = query(collection(db, "speed_users"), where("phone", "==", phone));
+            const querySnap = await getDocs(userQuery);
+            
+            if(currentMode === 'REGISTER') {
+                if(!querySnap.empty) { showNotice("This number is already registered!"); return; }
+                
+                const newUser = {
+                    phone: phone,
+                    passwordPIN: password,
+                    balance: 0.00,
+                    uid: "SW" + Math.floor(100000 + Math.random() * 900000),
+                    createdAt: Date.now()
+                };
+                
+                const docRef = await addDoc(collection(db, "speed_users"), newUser);
+                localStorage.setItem('sw_user_id', docRef.id);
+                window.location.href = "dashboard.html";
+            } else {
+                let match = false;
+                querySnap.forEach(doc => {
+                    if(doc.data().passwordPIN === password) {
+                        localStorage.setItem('sw_user_id', doc.id);
+                        match = true;
+                    }
+                });
+                
+                if(match) { window.location.href = "dashboard.html"; } 
+                else { showNotice("Incorrect Phone Number or Password!"); }
+            }
+        };
+
+        if(localStorage.getItem('sw_user_id')) { window.location.href = "dashboard.html"; }
+        switchTab('LOGIN');
+    </script>
+</body>
+  </html>
